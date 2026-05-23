@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: maquinaria_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: adminpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      # Esto hace que tus datos no se borren si apagas el contenedor
+      - mysql_data:/var/lib/mysql
+
+  api:
+    build: . # Construye la imagen usando tu Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=db # Docker resuelve mágicamente el nombre del servicio 'db' a su IP
+      - DB_USER=admin
+      - DB_PASSWORD=adminpassword
+      - DB_NAME=maquinaria_db
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:
